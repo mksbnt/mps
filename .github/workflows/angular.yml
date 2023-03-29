@@ -16,6 +16,8 @@ jobs:
         node-version: '14.x'
     - name: Install dependencies
       run: npm install
+    - name: Install Angular CLI
+      run: npm install -g @angular/cli
     - name: Build and deploy
       run: |
         ng build --prod --base-href=/my-app/
