@@ -19,7 +19,6 @@ export class PointDialogComponent implements OnInit {
   })
 
   constructor(private dialogRef: MatDialogRef<PointDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: IPoint) {
-    this.form.controls.number.disable();
   }
 
   get point(): IPoint {
@@ -32,6 +31,6 @@ export class PointDialogComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // this.form.controls.number.disable();
+    this.form.controls.number.disable();
   }
 }
