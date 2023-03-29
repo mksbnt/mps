@@ -1,11 +1,12 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, NgZone, OnInit} from '@angular/core';
 import * as L from 'leaflet';
-import {DivIconOptions, IconOptions, latLng, Map, Marker, tileLayer} from 'leaflet';
+import { latLng, Map, Marker, tileLayer} from 'leaflet';
 import 'leaflet-arrowheads';
 import {PointsService} from "../../core/services/points.service";
 import {IPoint} from "../../core/models/point.model";
-import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
-import {PointDialogComponent} from "../../core/dialogs/point-dialog/point-dialog.component";
+import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
+import {PointDialogComponent} from "./point-dialog/point-dialog.component";
+import {FocusMonitor} from "@angular/cdk/a11y";
 
 @Component({
   selector: 'app-map', templateUrl: './map.component.html', styleUrls: ['./map.component.less']
@@ -20,7 +21,7 @@ export class MapComponent implements OnInit {
   map!: Map;
   points!: IPoint[];
 
-  constructor(private pointsService: PointsService, private dialog: MatDialog) {
+  constructor(private zone: NgZone, private focusMonitor: FocusMonitor, private pointsService: PointsService, private dialog: MatDialog) {
   }
 
   get scrollHeight(): string {
@@ -40,6 +41,7 @@ export class MapComponent implements OnInit {
 
   generateMarkers(): void {
     this.deleteAllPolylines();
+    this.deleteAllMarkers();
     this.markers = [];
     const locations = this.convertPointsToLocations(this.points)
 
@@ -50,11 +52,9 @@ export class MapComponent implements OnInit {
 
     this.createPolyline(locations, {color: 'red'}).addTo(this.map);
     this.markers.forEach((marker, index) => marker.on('dragend', () => this.onMarkerDragEnd(marker, index)))
-
     this.markers.forEach((marker, index) => marker.on('dblclick', () => {
-      const dialogConfig = new MatDialogConfig();
-      dialogConfig.data = this.points.find(point => point.number === this.getNumber(marker.options.icon?.options));
-      this.dialog.open(PointDialogComponent, dialogConfig);
+      const currentPoint = this.points.find(point => point.number === index + 1);
+      if (currentPoint) this.openDialog(currentPoint);
     }))
   }
 
@@ -157,11 +157,32 @@ export class MapComponent implements OnInit {
     });
   }
 
-  private getNumber(options: IconOptions | DivIconOptions | undefined): number {
-    return Number(this.removeHtmlTags(Object(options).html));
-  }
+   openDialog(point: IPoint): void {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.data = point;
 
-  removeHtmlTags(str: string): string {
-    return str.replace(/(<([^>]+)>)/ig, "");
+
+    this.zone.run(() => {
+      this.dialog.open(PointDialogComponent, dialogConfig);
+
+      const dialogRef = this.dialog.open(PointDialogComponent, dialogConfig)
+
+      dialogRef.afterClosed().subscribe(result => {
+
+        this.dialog.closeAll()
+
+        if (result) {
+          this.points.forEach(point => {
+            if (point.number === result.number) {
+              point.lat = result.lat;
+              point.lng = result.lng;
+              point.height = result.height;
+            }
+          })
+
+          this.generateMarkers();
+        }
+      });
+    });
   }
 }

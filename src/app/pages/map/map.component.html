@@ -1,7 +1,7 @@
 <div class="container">
   <aside>
-    <ul class="points" *ngIf="points">
-      <li class="point" *ngFor="let item of points; let i = index">
+    <ul *ngIf="points" class="points">
+      <li *ngFor="let item of points; let i = index" class="point">
         <mat-card>
           <mat-card-header class="header">
             <mat-card-subtitle class="details">
@@ -12,8 +12,8 @@
             </mat-card-subtitle>
           </mat-card-header>
           <mat-card-actions class="actions">
-            <button mat-button>EDIT</button>
-            <button mat-button (click)="deletePoint(i)">DELETE</button>
+            <button (click)="openDialog(item)" mat-button>EDIT</button>
+            <button (click)="deletePoint(i)" mat-button>DELETE</button>
           </mat-card-actions>
         </mat-card>
       </li>
@@ -21,7 +21,7 @@
 
     <ul class="buttons">
       <li class="button">
-        <button mat-button (click)="addPoint()">ADD POINT</button>
+        <button (click)="addPoint()" mat-button>ADD POINT</button>
       </li>
     </ul>
 
@@ -36,36 +36,3 @@
     </div>
   </main>
 </div>
-
-<!--<mat-drawer-container class="example-container" autosize>-->
-<!--  <mat-drawer #drawer class="example-sidenav" mode="side" opened="true">-->
-<!--        <ul class="points" *ngIf="points">-->
-<!--          <li class="point" *ngFor="let item of points">-->
-<!--            <span>Number: {{item.number}};</span>-->
-<!--            <span>Lng: {{item.lng}};</span>-->
-<!--            <span>Lat: {{item.lat}};</span>-->
-<!--            <span>Height: {{item.height}};</span>-->
-<!--          </li>-->
-<!--        </ul>-->
-
-<!--        <button (click)="addPoint()">Add point</button>-->
-<!--  </mat-drawer>-->
-
-<!--  <div class="example-sidenav-content">-->
-<!--&lt;!&ndash;    <button type="button" mat-button (click)="drawer.toggle()">&ndash;&gt;-->
-<!--&lt;!&ndash;      Toggle sidenav&ndash;&gt;-->
-<!--&lt;!&ndash;    </button>&ndash;&gt;-->
-
-<!--        <div-->
-<!--          (leafletMapReady)="onLeafletMapReady($event)"-->
-<!--          [leafletOptions]="leafletOptions"-->
-<!--          [ngStyle]="{'height': scrollHeight}"-->
-<!--          leaflet style="width: 100%">-->
-<!--        </div>-->
-<!--  </div>-->
-
-<!--</mat-drawer-container>-->
-
-
-
-
