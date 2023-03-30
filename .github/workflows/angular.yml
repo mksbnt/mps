@@ -13,14 +13,14 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '14.x'
+        node-version: '16.x'
     - name: Install dependencies
       run: npm install
     - name: Install Angular CLI
       run: npm install -g @angular/cli
     - name: Build and deploy
       run: |
-        ng build --prod --base-href=/my-app/
+        ng build --configuration development --base-href=/my-app/
         npx angular-cli-ghpages --dir=dist/my-app --no-silent
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
