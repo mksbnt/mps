@@ -18,7 +18,7 @@ jobs:
       run: npm install
     - name: Install Angular CLI
       run: npm install -g @angular/cli
-    - name: Congig git
+    - name: Config git
       run:
         git config --global user.email "mksbnt@icloud.com"
         git config --global user.name "mksbnt"
