@@ -17,10 +17,10 @@ jobs:
     - name: Install dependencies
       run: npm install
     - name: Install Angular CLI
-      run: npm install -g @angular/cli
+      run: 
+        npm install -g @angular/cli
+        npx angular-cli-ghpages
     - name: Build and deploy
-      run:
-        ng build --configuration development --base-href=/mps/
-        npx angular-cli-ghpages --dir=dist/mps --no-silent
+      run: ng build --configuration development --base-href=/mps/ && npx angular-cli-ghpages --dir=dist/mps --no-silent
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
