@@ -22,7 +22,7 @@ jobs:
     - name: Set git user
       run: |
         git config --global user.email "mksbnt@icloud.com"
-        git config --global user.name "mksbnt"
+        git config --global user.name "maksimk"
     - name: Build and deploy
       run: ng build --configuration development --base-href=/mps/ && npx angular-cli-ghpages --dir=dist/mps --no-silent
       env:
