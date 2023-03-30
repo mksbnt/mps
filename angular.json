@@ -17,6 +17,11 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "allowedCommonJsDependencies": [
+              "leaflet",
+              "leaflet-draw",
+              "leaflet-arrowheads"
+            ],
             "outputPath": "dist/mps",
             "index": "src/index.html",
             "main": "src/main.ts",
