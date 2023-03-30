@@ -108,8 +108,8 @@
         "github-pages": {
           "builder": "@angular-devkit/build-angular:github-pages",
           "options": {
-            "outputPath": "dist/my-app",
-            "baseHref": "/my-app/"
+            "outputPath": "dist/mps",
+            "baseHref": "/mps/"
           }
         }
       }
