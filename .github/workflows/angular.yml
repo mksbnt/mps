@@ -17,13 +17,13 @@ jobs:
     - name: Install dependencies
       run: npm install
     - name: Install Angular CLI
-      run: 
+      run:
         npm install -g @angular/cli
     - name: Set git user
       run: |
         git config --global user.email "mksbnt@icloud.com"
         git config --global user.name "mksbnt"
     - name: Build and deploy
-      run: ng build --base-href=/mps/ && npx angular-cli-ghpages --dir=dist/mps --no-silent
+      run: ng build  --configuration production --base-href=/mps/ && npx angular-cli-ghpages --dir=dist/mps --no-silent
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
