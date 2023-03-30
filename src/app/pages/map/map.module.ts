@@ -8,6 +8,8 @@ import {MatButtonModule} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
 import {MatCardModule} from "@angular/material/card";
 import {MatDialogModule} from '@angular/material/dialog';
+import {ClipboardModule} from "@angular/cdk/clipboard";
+import {CdkDrag, CdkDropList} from "@angular/cdk/drag-drop";
 
 
 @NgModule({
@@ -23,6 +25,9 @@ import {MatDialogModule} from '@angular/material/dialog';
     MatIconModule,
     MatCardModule,
     MatDialogModule,
+    ClipboardModule,
+    CdkDropList,
+    CdkDrag,
   ],
 })
 export class MapModule {

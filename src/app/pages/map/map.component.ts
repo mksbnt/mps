@@ -8,6 +8,7 @@ import {MatDialog} from '@angular/material/dialog';
 import {PointDialogComponent} from "./point-dialog/point-dialog.component";
 import {BehaviorSubject} from "rxjs";
 import {convertPointsToLocations} from "../../shared/points-to-locations.util";
+import {CdkDragDrop, moveItemInArray, transferArrayItem} from "@angular/cdk/drag-drop";
 
 @Component({
   selector: 'app-map', templateUrl: './map.component.html', styleUrls: ['./map.component.less']
@@ -65,6 +66,26 @@ export class MapComponent implements OnInit {
     }
 
     points.sort((a, b) => a.number - b.number);
+
+    this.points$.next(points);
+  }
+
+  drop(event: CdkDragDrop<IPoint[]>) {
+    if (event.previousContainer === event.container) {
+      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+    } else {
+      transferArrayItem(
+        event.previousContainer.data,
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex,
+      );
+    }
+
+    const points = this.points$.getValue();
+    points.forEach((point, index) => {
+      point.number = index + 1;
+    });
 
     this.points$.next(points);
   }

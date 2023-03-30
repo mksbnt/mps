@@ -9,25 +9,34 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     right: 2px;
     width: 16px;
     height: 16px;
-    background-color: red;
-    border-radius: 50%;
+
     display: flex;
     justify-content: center;
     align-items: center;
+
     color: black;
     font-size: 12px;
-    box-shadow: 0 0 0 rgba(0, 0, 0, 0.4);
+    background: #ff0000;
+    box-shadow: 0 0 0 rgba(255, 0, 0, 0.4);
+    border-radius: 50%;
     animation: pulse 2s infinite;
+
+    &:hover {
+      animation: none;
+    }
   }
 
 @keyframes pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.4);
+    -moz-box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.4);
+    box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.4);
   }
   70% {
-    box-shadow: 0 0 0 4px rgba(0, 0, 0, 0);
+    -moz-box-shadow: 0 0 0 6px rgba(255, 0, 0, 0);
+    box-shadow: 0 0 0 6px rgba(255, 0, 0, 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+    -moz-box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
+    box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
   }
 }

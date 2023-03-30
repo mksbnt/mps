@@ -10,20 +10,29 @@
       <mat-icon>room</mat-icon>
     </button>
 
-    <ul class="points">
-      <li *ngFor="let item of points$ | async; let i = index" class="point">
+    <ul class="points" cdkDropList [cdkDropListData]="points$.getValue()" (cdkDropListDropped)="drop($event)">
+      <li *ngFor="let item of points$ | async; let i = index" class="point" cdkDrag>
         <mat-card>
           <mat-card-header class="header">
             <mat-card-subtitle class="details">
               <div class="marker">{{item.number}}</div>
-              <span>LNG: {{item.lng}};</span>
-              <span>LAT: {{item.lat}};</span>
-              <span>HGT: {{item.height}};</span>
+              <span class="data">LNG: {{item.lng}};</span>
+              <span class="data">LAT: {{item.lat}};</span>
+              <span class="data">HGT: {{item.height}};</span>
             </mat-card-subtitle>
           </mat-card-header>
           <mat-card-actions class="actions">
-            <button (click)="openDialog(item)" mat-button>EDIT</button>
-            <button (click)="deletePoint(i)" mat-button>DELETE</button>
+            <button [cdkCopyToClipboard]="item | json" color="accent" mat-icon-button aria-label="Copy to clipboard">
+              <mat-icon>file_copy</mat-icon>
+            </button>
+
+            <button (click)="openDialog(item)" color="accent" mat-icon-button aria-label="Edit">
+              <mat-icon>edit</mat-icon>
+            </button>
+
+            <button (click)="deletePoint(i)" color="accent" mat-icon-button aria-label="Delete">
+              <mat-icon>delete</mat-icon>
+            </button>
           </mat-card-actions>
         </mat-card>
       </li>
