@@ -1,7 +1,7 @@
 <div class="container">
   <aside>
-    <ul *ngIf="points" class="points">
-      <li *ngFor="let item of points; let i = index" class="point">
+    <ul class="points">
+      <li *ngFor="let item of points$ | async; let i = index" class="point">
         <mat-card>
           <mat-card-header class="header">
             <mat-card-subtitle class="details">

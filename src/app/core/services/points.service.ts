@@ -16,4 +16,8 @@ export class PointsService {
   getPoints(): Observable<IPoint[]> {
     return of(this.points);
   }
+
+  postPoints(points: IPoint[]) {
+    console.log(points)
+  }
 }

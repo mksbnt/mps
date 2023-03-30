@@ -1,27 +1,27 @@
 import {Component, NgZone, OnInit} from '@angular/core';
 import * as L from 'leaflet';
-import { latLng, Map, Marker, tileLayer} from 'leaflet';
+import {latLng, Map, Marker, tileLayer} from 'leaflet';
 import 'leaflet-arrowheads';
 import {PointsService} from "../../core/services/points.service";
 import {IPoint} from "../../core/models/point.model";
-import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
+import {MatDialog} from '@angular/material/dialog';
 import {PointDialogComponent} from "./point-dialog/point-dialog.component";
-import {FocusMonitor} from "@angular/cdk/a11y";
+import {BehaviorSubject} from "rxjs";
 
 @Component({
   selector: 'app-map', templateUrl: './map.component.html', styleUrls: ['./map.component.less']
 })
 export class MapComponent implements OnInit {
+  map!: Map;
+  points$ = new BehaviorSubject<IPoint[]>([]);
   markers: Marker[] = [];
   leafletOptions = {
     layers: [tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 18, attribution: '...'})],
     zoom: 17,
     center: latLng(50.4851493, 30.4721233)
   };
-  map!: Map;
-  points!: IPoint[];
 
-  constructor(private zone: NgZone, private focusMonitor: FocusMonitor, private pointsService: PointsService, private dialog: MatDialog) {
+  constructor(private zone: NgZone, private pointsService: PointsService, private dialog: MatDialog) {
   }
 
   get scrollHeight(): string {
@@ -30,32 +30,45 @@ export class MapComponent implements OnInit {
 
   ngOnInit(): void {
     this.pointsService.getPoints().pipe().subscribe(points => {
-      this.points = points;
+      this.points$.next(points);
     })
   }
 
   onLeafletMapReady(map: Map): void {
     this.map = map;
-    this.generateMarkers();
+    this.points$.subscribe(points => {
+      this.generateScheme(points);
+      this.pointsService.postPoints(points);
+    });
   }
 
-  generateMarkers(): void {
+
+  generateScheme(points: IPoint[]): void {
+    this.eraseScheme();
+    this.drawScheme(points);
+    this.listenScheme();
+  }
+
+  eraseScheme(): void {
     this.deleteAllPolylines();
     this.deleteAllMarkers();
     this.markers = [];
-    const locations = this.convertPointsToLocations(this.points)
+  }
 
-    this.points.forEach((point) => {
-      const newMarker: L.Marker = this.createMarker(point.number, point.lat, point.lng).addTo(this.map);
-      this.markers.push(newMarker);
-    });
+  listenScheme(): void {
+    for (const [index, marker] of this.markers.entries()) {
+      marker.off('dragend').on('dragend', () => this.onMarkerDragEnd(marker, index));
+      marker.off('dblclick').on('dblclick', () => this.onMarkerDoubleClick(index));
+    }
+  }
 
-    this.createPolyline(locations, {color: 'red'}).addTo(this.map);
-    this.markers.forEach((marker, index) => marker.on('dragend', () => this.onMarkerDragEnd(marker, index)))
-    this.markers.forEach((marker, index) => marker.on('dblclick', () => {
-      const currentPoint = this.points.find(point => point.number === index + 1);
-      if (currentPoint) this.openDialog(currentPoint);
-    }))
+  onMarkerDragEnd(marker: L.Marker, index: number): void {
+    this.updatePointCoordinates(marker.getLatLng(), index);
+  }
+
+  onMarkerDoubleClick(index: number): void {
+    const currentPoint = this.points$.value.find(point => point.number === index + 1);
+    if (currentPoint) this.openDialog(currentPoint);
   }
 
   createPolyline(locations: L.LatLngExpression[], options: L.PolylineOptions): L.Polyline {
@@ -86,15 +99,13 @@ export class MapComponent implements OnInit {
 
   addPoint(): void {
     const newPoint: IPoint = {
-      number: this.points.length + 1, lat: 50.4851493, lng: 30.4721233, height: 100,
+      number: this.points$.value.length + 1, lat: 50.4851493, lng: 30.4721233, height: 100,
     };
-    this.points.push(newPoint);
-    const newMarker: L.Marker = this.createMarker(newPoint.number, newPoint.lat, newPoint.lng).addTo(this.map);
-    this.markers.push(newMarker);
-    const locations = this.convertPointsToLocations(this.points);
-    this.deleteAllPolylines();
-    this.createPolyline(locations, {color: 'red'}).addTo(this.map);
-    this.markers.forEach((marker, index) => marker.on('dragend', () => this.onMarkerDragEnd(marker, index)))
+
+    const currentPoints = this.points$.value;
+    currentPoints.push(newPoint);
+
+    this.points$.next(currentPoints);
   }
 
   deleteAllPolylines(): void {
@@ -113,66 +124,49 @@ export class MapComponent implements OnInit {
     });
   }
 
-  onMarkerDragEnd(marker: L.Marker, index: number): void {
-    const locations = this.convertPointsToLocations(this.points);
-    locations[index] = marker.getLatLng();
-    this.points.map(point => {
+  updatePointCoordinates(newLatLng: L.LatLng, index: number): void {
+    const pointToUpdate = this.points$.value.find(point => point.number === index + 1);
+    if (!pointToUpdate) {
+      return;
+    }
+
+    const updatedPoint = {
+      ...pointToUpdate, lat: newLatLng.lat, lng: newLatLng.lng,
+    };
+
+    const updatedPoints = this.points$.value.map(point => {
       if (point.number === index + 1) {
-        point.lat = marker.getLatLng().lat;
-        point.lng = marker.getLatLng().lng
+        return updatedPoint;
       }
+      return point;
     });
-    this.deleteAllPolylines();
-    this.createPolyline(locations, {color: 'red'}).addTo(this.map);
-    this.markers.forEach((marker) => marker.off('dragend'));
-    this.markers.forEach((marker, index) => marker.on('dragend', () => this.onMarkerDragEnd(marker, index)));
+
+    this.points$.next(updatedPoints);
   }
 
   deletePoint(index: number): void {
-    this.deleteAllPolylines();
-    this.deleteAllMarkers();
+    const points = this.points$.getValue() //.splice(index, 1);
+    const deletedPoint = points.splice(index, 1)[0];
 
-    const markerToRemove = this.markers.splice(index, 1)[0];
-    (markerToRemove as L.Marker).remove();
-    this.points.splice(index, 1);
+    for (let i = index; i < points.length; i++) {
+      points[i].number = i + 1;
+    }
 
-    this.points = this.orderPoints(this.points);
+    points.sort((a, b) => a.number - b.number);
 
-    this.markers = [];
-    this.points.forEach((point) => {
-      const newMarker: L.Marker = this.createMarker(point.number, point.lat, point.lng).addTo(this.map);
-      this.markers.push(newMarker);
-    });
-
-    const locations = this.convertPointsToLocations(this.points);
-    this.createPolyline(locations, {color: 'red'}).addTo(this.map);
-
-    this.markers.forEach((marker) => marker.off('dragend'));
-    this.markers.forEach((marker, index) => marker.on('dragend', () => this.onMarkerDragEnd(marker, index)));
+    this.points$.next(points);
   }
 
-  orderPoints(points: IPoint[]) {
-    return points.map((point, index) => {
-      return {...point, number: index + 1};
-    });
-  }
 
-   openDialog(point: IPoint): void {
-    const dialogConfig = new MatDialogConfig();
-    dialogConfig.data = point;
-
-
+  openDialog(point: IPoint): void {
     this.zone.run(() => {
-      this.dialog.open(PointDialogComponent, dialogConfig);
-
-      const dialogRef = this.dialog.open(PointDialogComponent, dialogConfig)
+      const dialogRef = this.dialog.open(PointDialogComponent, {data: point})
 
       dialogRef.afterClosed().subscribe(result => {
 
-        this.dialog.closeAll()
-
         if (result) {
-          this.points.forEach(point => {
+          const points = this.points$.value.slice();
+          points.forEach(point => {
             if (point.number === result.number) {
               point.lat = result.lat;
               point.lng = result.lng;
@@ -180,9 +174,24 @@ export class MapComponent implements OnInit {
             }
           })
 
-          this.generateMarkers();
+          this.points$.next(points);
         }
       });
+    });
+  }
+
+  private drawScheme(points: IPoint[]): void {
+    this.drawMarkers(points);
+    this.drawPolylines(points);
+  }
+
+  private drawPolylines(points: IPoint[]): void {
+    this.createPolyline(this.convertPointsToLocations(points), {color: 'red'}).addTo(this.map);
+  }
+
+  private drawMarkers(points: IPoint[]): void {
+    this.markers = points.map((point) => {
+      return this.createMarker(point.number, point.lat, point.lng).addTo(this.map);
     });
   }
 }

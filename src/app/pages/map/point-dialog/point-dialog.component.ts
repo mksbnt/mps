@@ -18,7 +18,7 @@ export class PointDialogComponent implements OnInit {
     height: this.data.height
   })
 
-  constructor(private dialogRef: MatDialogRef<PointDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: IPoint) {
+  constructor(@Inject(MAT_DIALOG_DATA) public data: IPoint) {
   }
 
   get point(): IPoint {
