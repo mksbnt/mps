@@ -24,6 +24,6 @@ jobs:
         git config --global user.email "mksbnt@icloud.com"
         git config --global user.name "mksbnt"
     - name: Build and deploy
-      run: ng build --configuration development --base-href=/mps/ && npx angular-cli-ghpages --dir=dist/mps --no-silent
+      run: ng build --base-href=/mps/ && npx angular-cli-ghpages --dir=dist/mps --no-silent
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
