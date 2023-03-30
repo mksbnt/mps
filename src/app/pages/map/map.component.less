@@ -5,50 +5,39 @@
   &.closed {
     grid-template-columns: 0 1fr;
 
-    .toggle {
-      left: 10px;
+    .toggle, .add-point {
+      left: 8px;
     }
   }
 
   &.opened {
     grid-template-columns: 215px 1fr;
 
-    .toggle {
-      left: 225px;
+    .toggle, .add-point {
+      left: 196px;
     }
   }
 
   aside {
     max-height: 100vh;
     overflow: scroll;
-    background-image: url('https://images.rawpixel.com/image_1300/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvdjEwODgtcC0wMDA1YS14LmpwZw.jpg');
+    background-image: url('https://img.freepik.com/premium-vector/ukraine-camouflage-mm-14-pixel-seamless-military-pattern-texture-olive-colors-abstract-masking_653528-1434.jpg?w=1380');
     background-repeat: no-repeat;
     background-size: cover;
 
     .toggle {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 22px;
       position: absolute;
-      z-index: 1000;
-      background-color: #fff;
-      line-height: 30px;
-      top: 94px;
-      width: 34px;
-      height: 34px;
-      border: 2px solid rgba(0, 0, 0, 0.2);
-      background-clip: padding-box;
-      border-radius: 4px;
-      cursor: pointer;
+      top: 97px;
+      z-index: 888;
+    }
 
-      &:hover {
-        background-color: #f4f4f4;
-      }
+    .add-point {
+      position: absolute;
+      top: 143px;
+      z-index: 888;
     }
 
     .points {
-      max-height: calc(100vh - 84px);
       overflow: scroll;
 
       .point {

@@ -1,14 +1,14 @@
-<div class="container" [ngClass]="isAsideOpened ? 'opened' : 'closed'">
+<div [ngClass]="isAsideOpened ? 'opened' : 'closed'" class="container">
   <aside>
+    <button (click)="toggleAside()" aria-label="Toggle" class="toggle" color="accent"
+            mat-mini-fab>
+      <mat-icon>menu</mat-icon>
+    </button>
 
-    <button (click)="toggleAside()" class="toggle">{{isAsideOpened ? '&#8592;' : '&#8594;' }}</button>
-
-
-    <ul class="buttons">
-      <li class="button">
-        <button (click)="addPoint()" mat-button>ADD POINT</button>
-      </li>
-    </ul>
+    <button (click)="addPoint()" aria-label="Add Point" class="add-point" color="accent"
+            mat-mini-fab>
+      <mat-icon>room</mat-icon>
+    </button>
 
     <ul class="points">
       <li *ngFor="let item of points$ | async; let i = index" class="point">
