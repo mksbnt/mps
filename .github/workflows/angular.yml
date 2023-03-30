@@ -18,6 +18,9 @@ jobs:
       run: npm install
     - name: Install Angular CLI
       run: npm install -g @angular/cli
+    - name: Congig git
+        git config --global user.email "mksbnt@icloud.com"
+        git config --global user.name "mksbnt"
     - name: Build and deploy
       run: |
         ng build --configuration development --base-href=/mps/
