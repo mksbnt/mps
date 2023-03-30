@@ -7,11 +7,13 @@ import {IPoint} from "../../core/models/point.model";
 import {MatDialog} from '@angular/material/dialog';
 import {PointDialogComponent} from "./point-dialog/point-dialog.component";
 import {BehaviorSubject} from "rxjs";
+import {convertPointsToLocations} from "../../shared/points-to-locations.util";
 
 @Component({
   selector: 'app-map', templateUrl: './map.component.html', styleUrls: ['./map.component.less']
 })
 export class MapComponent implements OnInit {
+  isAsideOpened: boolean = false;
   map!: Map;
   points$ = new BehaviorSubject<IPoint[]>([]);
   markers: Marker[] = [];
@@ -42,61 +44,6 @@ export class MapComponent implements OnInit {
     });
   }
 
-
-  generateScheme(points: IPoint[]): void {
-    this.eraseScheme();
-    this.drawScheme(points);
-    this.listenScheme();
-  }
-
-  eraseScheme(): void {
-    this.deleteAllPolylines();
-    this.deleteAllMarkers();
-    this.markers = [];
-  }
-
-  listenScheme(): void {
-    for (const [index, marker] of this.markers.entries()) {
-      marker.off('dragend').on('dragend', () => this.onMarkerDragEnd(marker, index));
-      marker.off('dblclick').on('dblclick', () => this.onMarkerDoubleClick(index));
-    }
-  }
-
-  onMarkerDragEnd(marker: L.Marker, index: number): void {
-    this.updatePointCoordinates(marker.getLatLng(), index);
-  }
-
-  onMarkerDoubleClick(index: number): void {
-    const currentPoint = this.points$.value.find(point => point.number === index + 1);
-    if (currentPoint) this.openDialog(currentPoint);
-  }
-
-  createPolyline(locations: L.LatLngExpression[], options: L.PolylineOptions): L.Polyline {
-    const polyline = L.polyline(locations, options);
-    polyline.arrowheads({
-      yawn: 20, fill: true, offsets: {end: '10px'}
-    });
-    return polyline;
-  }
-
-  convertPointsToLocations(points: IPoint[]): { lat: number, lng: number }[] {
-    return points.map(point => ({lat: point.lat, lng: point.lng}));
-  }
-
-  createMarker(serialNumber: number, lat: number, lng: number): L.Marker {
-    const markerElement = document.createElement('div');
-    markerElement.className = 'marker';
-    markerElement.innerText = String(serialNumber);
-
-    const icon = L.divIcon({
-      html: markerElement.outerHTML, className: 'marker-icon',
-    });
-
-    return L.marker([lat, lng], {
-      icon, draggable: true
-    });
-  }
-
   addPoint(): void {
     const newPoint: IPoint = {
       number: this.points$.value.length + 1, lat: 50.4851493, lng: 30.4721233, height: 100,
@@ -106,42 +53,6 @@ export class MapComponent implements OnInit {
     currentPoints.push(newPoint);
 
     this.points$.next(currentPoints);
-  }
-
-  deleteAllPolylines(): void {
-    this.map.eachLayer((layer) => {
-      if (layer instanceof L.Polyline) {
-        layer.remove();
-      }
-    });
-  }
-
-  deleteAllMarkers(): void {
-    this.map.eachLayer((layer) => {
-      if (layer instanceof L.Marker) {
-        layer.remove();
-      }
-    });
-  }
-
-  updatePointCoordinates(newLatLng: L.LatLng, index: number): void {
-    const pointToUpdate = this.points$.value.find(point => point.number === index + 1);
-    if (!pointToUpdate) {
-      return;
-    }
-
-    const updatedPoint = {
-      ...pointToUpdate, lat: newLatLng.lat, lng: newLatLng.lng,
-    };
-
-    const updatedPoints = this.points$.value.map(point => {
-      if (point.number === index + 1) {
-        return updatedPoint;
-      }
-      return point;
-    });
-
-    this.points$.next(updatedPoints);
   }
 
   deletePoint(index: number): void {
@@ -156,7 +67,6 @@ export class MapComponent implements OnInit {
 
     this.points$.next(points);
   }
-
 
   openDialog(point: IPoint): void {
     this.zone.run(() => {
@@ -180,18 +90,108 @@ export class MapComponent implements OnInit {
     });
   }
 
+  private generateScheme(points: IPoint[]): void {
+    this.eraseScheme();
+    this.drawScheme(points);
+    this.listenScheme();
+  }
+
+  private eraseScheme(): void {
+    this.deleteAllPolylines();
+    this.deleteAllMarkers();
+  }
+
+  private listenScheme(): void {
+    for (const [index, marker] of this.markers.entries()) {
+      marker.off('dragend').on('dragend', () => this.onMarkerDragEnd(marker, index));
+      marker.off('dblclick').on('dblclick', () => this.onMarkerDoubleClick(index));
+    }
+  }
+
+  private onMarkerDragEnd(marker: L.Marker, index: number): void {
+    this.updatePointCoordinates(marker.getLatLng(), index);
+  }
+
+  private onMarkerDoubleClick(index: number): void {
+    const currentPoint = this.points$.value.find(point => point.number === index + 1);
+    if (currentPoint) this.openDialog(currentPoint);
+  }
+
+  private drawPolyline(locations: L.LatLngExpression[], options: L.PolylineOptions): L.Polyline {
+    const polyline = L.polyline(locations, options);
+    polyline.arrowheads({
+      yawn: 13, fill: true, offsets: {end: '10px'}
+    });
+    return polyline;
+  }
+
+  private drawMarker(serialNumber: number, lat: number, lng: number): L.Marker {
+    const markerElement = document.createElement('div');
+    markerElement.className = 'marker';
+    markerElement.innerText = String(serialNumber);
+
+    const icon = L.divIcon({
+      html: markerElement.outerHTML, className: 'marker-icon',
+    });
+
+    return L.marker([lat, lng], {
+      icon, draggable: true
+    });
+  }
+
+  private deleteAllPolylines(): void {
+    this.map.eachLayer((layer) => {
+      if (layer instanceof L.Polyline) {
+        layer.remove();
+      }
+    });
+  }
+
+  private deleteAllMarkers(): void {
+    this.markers = [];
+    this.map.eachLayer((layer) => {
+      if (layer instanceof L.Marker) {
+        layer.remove();
+      }
+    });
+  }
+
+  private updatePointCoordinates(newLatLng: L.LatLng, index: number): void {
+    const pointToUpdate = this.points$.value.find(point => point.number === index + 1);
+    if (!pointToUpdate) {
+      return;
+    }
+
+    const updatedPoint = {
+      ...pointToUpdate, lat: newLatLng.lat, lng: newLatLng.lng,
+    };
+
+    const updatedPoints = this.points$.value.map(point => {
+      if (point.number === index + 1) {
+        return updatedPoint;
+      }
+      return point;
+    });
+
+    this.points$.next(updatedPoints);
+  }
+
   private drawScheme(points: IPoint[]): void {
     this.drawMarkers(points);
     this.drawPolylines(points);
   }
 
   private drawPolylines(points: IPoint[]): void {
-    this.createPolyline(this.convertPointsToLocations(points), {color: 'red'}).addTo(this.map);
+    this.drawPolyline(convertPointsToLocations(points), {color: 'red'}).addTo(this.map);
   }
 
   private drawMarkers(points: IPoint[]): void {
     this.markers = points.map((point) => {
-      return this.createMarker(point.number, point.lat, point.lng).addTo(this.map);
+      return this.drawMarker(point.number, point.lat, point.lng).addTo(this.map);
     });
+  }
+
+  toggleAside() {
+    this.isAsideOpened = !this.isAsideOpened;
   }
 }
