@@ -1,4 +1,4 @@
-import {Component, NgZone, OnInit} from '@angular/core';
+import {Component, ElementRef, NgZone, OnInit, ViewChild} from '@angular/core';
 import * as L from 'leaflet';
 import {latLng, Map, Marker, tileLayer} from 'leaflet';
 import 'leaflet-arrowheads';
@@ -22,6 +22,7 @@ export class MapComponent implements OnInit {
     zoom: 17,
     center: latLng(50.4851493, 30.4721233)
   };
+  @ViewChild('aside') asideElement!: ElementRef;
 
   constructor(private zone: NgZone, private pointsService: PointsService, private dialog: MatDialog) {
   }
@@ -56,7 +57,7 @@ export class MapComponent implements OnInit {
   }
 
   deletePoint(index: number): void {
-    const points = this.points$.getValue() //.splice(index, 1);
+    const points = this.points$.getValue();
     const deletedPoint = points.splice(index, 1)[0];
 
     for (let i = index; i < points.length; i++) {
@@ -191,7 +192,7 @@ export class MapComponent implements OnInit {
     });
   }
 
-  toggleAside() {
+  toggleAside(): void {
     this.isAsideOpened = !this.isAsideOpened;
   }
 }

@@ -1,5 +1,5 @@
 <div [ngClass]="isAsideOpened ? 'opened' : 'closed'" class="container">
-  <aside>
+  <aside #aside>
     <button (click)="toggleAside()" aria-label="Toggle" class="toggle" color="accent"
             mat-mini-fab>
       <mat-icon>menu</mat-icon>
@@ -15,7 +15,7 @@
         <mat-card>
           <mat-card-header class="header">
             <mat-card-subtitle class="details">
-              <span>NUM: {{item.number}};</span>
+              <div class="marker">{{item.number}}</div>
               <span>LNG: {{item.lng}};</span>
               <span>LAT: {{item.lat}};</span>
               <span>HGT: {{item.height}};</span>
