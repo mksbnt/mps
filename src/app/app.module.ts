@@ -2,7 +2,6 @@ import {NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {LeafletModule} from '@asymmetrik/ngx-leaflet';
 import {LeafletDrawModule} from '@asymmetrik/ngx-leaflet-draw';
-
 import {AppComponent} from './app.component';
 import {RouterOutlet} from "@angular/router";
 import {AppRoutingModule} from "./app-routing.module";
@@ -13,9 +12,12 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MatInputModule} from "@angular/material/input";
 import {MatDialogModule} from "@angular/material/dialog";
 import {MatButtonModule} from "@angular/material/button";
+import {UpdatePointNumbersPipe} from './core/pipes/update-point-numbers.pipe';
+import { IncrementPipe } from './core/pipes/increment.pipe';
+import { LocationsPipe } from './core/pipes/locations.pipe';
 
 @NgModule({
-  declarations: [AppComponent, PointDialogComponent],
+  declarations: [AppComponent, PointDialogComponent, UpdatePointNumbersPipe, IncrementPipe, LocationsPipe],
   imports: [
     BrowserModule,
     LeafletModule,
@@ -30,7 +32,7 @@ import {MatButtonModule} from "@angular/material/button";
     MatButtonModule,
     FormsModule
   ],
-  providers: [],
+  providers: [UpdatePointNumbersPipe, IncrementPipe, LocationsPipe],
   bootstrap: [AppComponent],
 })
 export class AppModule {

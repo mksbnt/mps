@@ -7,8 +7,10 @@ import {IPoint} from "../../core/models/point.model";
 import {MatDialog} from '@angular/material/dialog';
 import {PointDialogComponent} from "./point-dialog/point-dialog.component";
 import {BehaviorSubject} from "rxjs";
-import {convertPointsToLocations} from "../../shared/points-to-locations.util";
-import {CdkDragDrop, moveItemInArray, transferArrayItem} from "@angular/cdk/drag-drop";
+import {CdkDragDrop, moveItemInArray} from "@angular/cdk/drag-drop";
+import {UpdatePointNumbersPipe} from "../../core/pipes/update-point-numbers.pipe";
+import {IncrementPipe} from "../../core/pipes/increment.pipe";
+import {LocationsPipe} from "../../core/pipes/locations.pipe";
 
 @Component({
   selector: 'app-map', templateUrl: './map.component.html', styleUrls: ['./map.component.less']
@@ -25,11 +27,7 @@ export class MapComponent implements OnInit {
     center: latLng(50.4851493, 30.4721233)
   };
 
-  constructor(
-    private zone: NgZone,
-    private pointsService: PointsService,
-    private dialog: MatDialog,
-  ) {
+  constructor(private zone: NgZone, private pointsService: PointsService, private dialog: MatDialog, private orderPipe: UpdatePointNumbersPipe, private incrementPipe: IncrementPipe, private locationsPipe: LocationsPipe,) {
   }
 
   get scrollHeight(): string {
@@ -52,47 +50,36 @@ export class MapComponent implements OnInit {
 
   addPoint(): void {
     const newPoint: IPoint = {
-      number: this.points$.value.length + 1, lat: 50.4851493, lng: 30.4721233, height: 100,
+      number: this.incrementPipe.transform(this.points$.getValue().length),
+      lat: this.map.getCenter().lat,
+      lng: this.map.getCenter().lng,
+      height: 0,
     };
-
-    const currentPoints = this.points$.value;
-    currentPoints.push(newPoint);
-
-    this.points$.next(currentPoints);
+    this.points$.next([...this.points$.value, newPoint]);
   }
 
   deletePoint(index: number): void {
     const points = this.points$.getValue();
-    const deletedPoint = points.splice(index, 1)[0];
+    points.splice(index, 1);
 
     for (let i = index; i < points.length; i++) {
-      points[i].number = i + 1;
+      points[i].number = this.incrementPipe.transform(i);
     }
 
-    points.sort((a, b) => a.number - b.number);
-
-    this.points$.next(points);
+    this.points$.next(points.sort((a, b) => a.number - b.number));
   }
 
   drop(event: CdkDragDrop<IPoint[]>): void {
+    const points = this.points$.getValue();
     if (event.previousContainer === event.container) {
-      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+      moveItemInArray(points, event.previousIndex, event.currentIndex);
     } else {
-      transferArrayItem(
-        event.previousContainer.data,
-        event.container.data,
-        event.previousIndex,
-        event.currentIndex,
-      );
+      const movedPoint = points.splice(event.previousIndex, 1)[0];
+      points.splice(event.currentIndex, 0, movedPoint);
     }
 
-    const points = this.points$.getValue();
-    points.forEach((point, index) => {
-      point.number = index + 1;
-    });
-
+    this.points$.next(this.orderPipe.transform(points));
     this.isGrabbing = false;
-    this.points$.next(points);
   }
 
   openDialog(point: IPoint): void {
@@ -152,7 +139,7 @@ export class MapComponent implements OnInit {
   }
 
   private onMarkerDoubleClick(index: number): void {
-    const currentPoint = this.points$.value.find(point => point.number === index + 1);
+    const currentPoint = this.points$.value.find(point => point.number === this.incrementPipe.transform(index));
     if (currentPoint) this.openDialog(currentPoint);
   }
 
@@ -196,7 +183,7 @@ export class MapComponent implements OnInit {
   }
 
   private updatePointCoordinates(newLatLng: L.LatLng, index: number): void {
-    const pointToUpdate = this.points$.value.find(point => point.number === index + 1);
+    const pointToUpdate = this.points$.value.find(point => point.number === this.incrementPipe.transform(index));
     if (!pointToUpdate) {
       return;
     }
@@ -206,7 +193,7 @@ export class MapComponent implements OnInit {
     };
 
     const updatedPoints = this.points$.value.map(point => {
-      if (point.number === index + 1) {
+      if (point.number === this.incrementPipe.transform(index)) {
         return updatedPoint;
       }
       return point;
@@ -221,7 +208,7 @@ export class MapComponent implements OnInit {
   }
 
   private drawPolylines(points: IPoint[]): void {
-    this.drawPolyline(convertPointsToLocations(points), {color: 'red'}).addTo(this.map);
+    this.drawPolyline(this.locationsPipe.transform(points), {color: 'red'}).addTo(this.map);
   }
 
   private drawMarkers(points: IPoint[]): void {
