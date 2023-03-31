@@ -1,52 +1,41 @@
-<div [ngClass]="(isAsideOpened ? 'opened' : 'closed') + (isGrabbing ? ' grabbing' : '')" class="container">
-  <aside #aside>
-    <button (click)="toggleAside()" aria-label="Toggle" class="toggle" color="accent"
-            mat-mini-fab>
+<div [ngClass]="{'opened': isAsideOpened, 'closed': !isAsideOpened, 'grabbing': isGrabbing}" class="container">
+  <aside>
+    <button (click)="toggleAside()" aria-label="Toggle" class="toggle" mat-mini-fab color="accent">
       <mat-icon>menu</mat-icon>
     </button>
 
-    <button (click)="addPoint()" aria-label="Add Point" class="add-point" color="accent"
-            mat-mini-fab>
+    <button (click)="addPoint()" aria-label="Add Point" class="add-point" mat-mini-fab color="accent">
       <mat-icon>room</mat-icon>
     </button>
 
-    <ul (cdkDropListDropped)="drop($event)" [cdkDropListData]="points$.getValue()" cdkDropList class="points">
-      <li (mousedown)="mouseDown()" (mouseup)="mouseUp()" *ngFor="let item of points$ | async; let i = index"
-          cdkDrag cdkDragLockAxis="y"
-          class="point">
+    <ul cdkDropList class="points" [cdkDropListData]="points$.getValue()" (cdkDropListDropped)="drop($event)">
+      <li *ngFor="let point of points$ | async; let i = index" class="point" cdkDrag cdkDragLockAxis="y" (mousedown)="mouseDown()" (mouseup)="mouseUp()">
         <mat-card class="card">
           <mat-card-header class="header">
             <mat-card-subtitle class="details">
-              <div class="marker">{{item.number}}</div>
-              <span class="data">LNG: {{item.lng}};</span>
-              <span class="data">LAT: {{item.lat}};</span>
-              <span class="data">HGT: {{item.height}};</span>
+              <div class="marker">{{point.number}}</div>
+              <span class="data">LNG: {{point.lng}};</span>
+              <span class="data">LAT: {{point.lat}};</span>
+              <span class="data">HGT: {{point.height}};</span>
             </mat-card-subtitle>
           </mat-card-header>
           <mat-card-actions class="actions">
-            <button [cdkCopyToClipboard]="item | json" aria-label="Copy to clipboard" color="accent" mat-icon-button>
+            <button mat-icon-button color="accent" [cdkCopyToClipboard]="point | json" aria-label="Copy to clipboard">
               <mat-icon>file_copy</mat-icon>
             </button>
-
-            <button (click)="openDialog(item)" aria-label="Edit" color="accent" mat-icon-button>
+            <button mat-icon-button color="accent" (click)="openDialog(point)" aria-label="Edit">
               <mat-icon>edit</mat-icon>
             </button>
-
-            <button (click)="deletePoint(i)" aria-label="Delete" color="accent" mat-icon-button>
+            <button mat-icon-button color="accent" (click)="deletePoint(i)" aria-label="Delete">
               <mat-icon>delete</mat-icon>
             </button>
           </mat-card-actions>
         </mat-card>
       </li>
     </ul>
-
   </aside>
+
   <main>
-    <div
-      (leafletMapReady)="onLeafletMapReady($event)"
-      [leafletOptions]="leafletOptions"
-      [ngStyle]="{'height': scrollHeight}"
-      leaflet style="width: 100%">
-    </div>
+    <div leaflet [leafletOptions]="leafletOptions" [ngStyle]="{'height': scrollHeight}" style="width: 100%" (leafletMapReady)="onLeafletMapReady($event)"></div>
   </main>
 </div>

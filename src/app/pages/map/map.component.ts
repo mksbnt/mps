@@ -121,11 +121,11 @@ export class MapComponent implements OnInit {
     this.isAsideOpened = !this.isAsideOpened;
   }
 
-  mouseDown() {
+  mouseDown(): void {
     this.isGrabbing = true;
   }
 
-  mouseUp() {
+  mouseUp(): void {
     this.isGrabbing = false;
   }
 
