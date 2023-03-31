@@ -6,22 +6,14 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
 
-## Code scaffolding
-
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
-
 ## Build
 
 Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
 
-## Running unit tests
+## Design patterns
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Observer pattern: The points$ BehaviorSubject is used to notify the subscribers about the changes in the points data. The subscribe method is used to register the observers, and the next method is used to notify the observers about the changes.
 
-## Running end-to-end tests
+Template method pattern: The MapComponent class provides a template method generateScheme that is used to draw the map elements (polylines and markers) based on the input data (points). This method defines the basic algorithm for drawing the map elements, but the details of the implementation are left to the Leaflet library. This can be seen as an implementation of the template method pattern.
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+Strategy pattern: The Leaflet library is used for displaying the map and handling the map-related operations. The code uses the Leaflet API to draw polylines, markers, and other map elements. This can be seen as an implementation of the strategy pattern because the Leaflet library provides a set of algorithms (strategies) for drawing the map elements, and the code uses these strategies to achieve the desired functionality.
