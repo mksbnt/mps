@@ -18,6 +18,10 @@
     }
   }
 
+  &.grabbing {
+    cursor: grabbing;
+  }
+
   aside {
     max-height: 100vh;
     overflow: scroll;
@@ -40,18 +44,29 @@
     .points {
       overflow: scroll;
 
+      &.cdk-drop-list-dragging {
+        cursor: grabbing;
+      }
+
+
       .point {
         margin: 10px;
 
-        .header {
-          padding: 8px 8px 0;
+        .card {
+          &.grabbing {
+            cursor: grabbing;
+          }
+          cursor: grab;
+          .header {
+            padding: 8px 8px 0;
 
-          .details {
-            display: flex;
-            flex-direction: column;
+            .details {
+              display: flex;
+              flex-direction: column;
 
-            .data {
-              font-size: 12px;
+              .data {
+                font-size: 12px;
+              }
             }
           }
         }

@@ -1,4 +1,4 @@
-import {Component, ElementRef, NgZone, OnInit, ViewChild} from '@angular/core';
+import {Component, NgZone, OnInit} from '@angular/core';
 import * as L from 'leaflet';
 import {latLng, Map, Marker, tileLayer} from 'leaflet';
 import 'leaflet-arrowheads';
@@ -14,6 +14,7 @@ import {CdkDragDrop, moveItemInArray, transferArrayItem} from "@angular/cdk/drag
   selector: 'app-map', templateUrl: './map.component.html', styleUrls: ['./map.component.less']
 })
 export class MapComponent implements OnInit {
+  isGrabbing: boolean = false;
   isAsideOpened: boolean = false;
   map!: Map;
   points$ = new BehaviorSubject<IPoint[]>([]);
@@ -23,9 +24,12 @@ export class MapComponent implements OnInit {
     zoom: 17,
     center: latLng(50.4851493, 30.4721233)
   };
-  @ViewChild('aside') asideElement!: ElementRef;
 
-  constructor(private zone: NgZone, private pointsService: PointsService, private dialog: MatDialog) {
+  constructor(
+    private zone: NgZone,
+    private pointsService: PointsService,
+    private dialog: MatDialog,
+  ) {
   }
 
   get scrollHeight(): string {
@@ -70,7 +74,7 @@ export class MapComponent implements OnInit {
     this.points$.next(points);
   }
 
-  drop(event: CdkDragDrop<IPoint[]>) {
+  drop(event: CdkDragDrop<IPoint[]>): void {
     if (event.previousContainer === event.container) {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     } else {
@@ -87,6 +91,7 @@ export class MapComponent implements OnInit {
       point.number = index + 1;
     });
 
+    this.isGrabbing = false;
     this.points$.next(points);
   }
 
@@ -110,6 +115,18 @@ export class MapComponent implements OnInit {
         }
       });
     });
+  }
+
+  toggleAside(): void {
+    this.isAsideOpened = !this.isAsideOpened;
+  }
+
+  mouseDown() {
+    this.isGrabbing = true;
+  }
+
+  mouseUp() {
+    this.isGrabbing = false;
   }
 
   private generateScheme(points: IPoint[]): void {
@@ -211,9 +228,5 @@ export class MapComponent implements OnInit {
     this.markers = points.map((point) => {
       return this.drawMarker(point.number, point.lat, point.lng).addTo(this.map);
     });
-  }
-
-  toggleAside(): void {
-    this.isAsideOpened = !this.isAsideOpened;
   }
 }

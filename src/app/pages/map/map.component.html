@@ -1,4 +1,4 @@
-<div [ngClass]="isAsideOpened ? 'opened' : 'closed'" class="container">
+<div [ngClass]="(isAsideOpened ? 'opened' : 'closed') + (isGrabbing ? ' grabbing' : '')" class="container">
   <aside #aside>
     <button (click)="toggleAside()" aria-label="Toggle" class="toggle" color="accent"
             mat-mini-fab>
@@ -10,9 +10,11 @@
       <mat-icon>room</mat-icon>
     </button>
 
-    <ul class="points" cdkDropList [cdkDropListData]="points$.getValue()" (cdkDropListDropped)="drop($event)">
-      <li *ngFor="let item of points$ | async; let i = index" class="point" cdkDrag>
-        <mat-card>
+    <ul (cdkDropListDropped)="drop($event)" [cdkDropListData]="points$.getValue()" cdkDropList class="points">
+      <li (mousedown)="mouseDown()" (mouseup)="mouseUp()" *ngFor="let item of points$ | async; let i = index"
+          cdkDrag cdkDragLockAxis="y"
+          class="point">
+        <mat-card class="card">
           <mat-card-header class="header">
             <mat-card-subtitle class="details">
               <div class="marker">{{item.number}}</div>
@@ -22,15 +24,15 @@
             </mat-card-subtitle>
           </mat-card-header>
           <mat-card-actions class="actions">
-            <button [cdkCopyToClipboard]="item | json" color="accent" mat-icon-button aria-label="Copy to clipboard">
+            <button [cdkCopyToClipboard]="item | json" aria-label="Copy to clipboard" color="accent" mat-icon-button>
               <mat-icon>file_copy</mat-icon>
             </button>
 
-            <button (click)="openDialog(item)" color="accent" mat-icon-button aria-label="Edit">
+            <button (click)="openDialog(item)" aria-label="Edit" color="accent" mat-icon-button>
               <mat-icon>edit</mat-icon>
             </button>
 
-            <button (click)="deletePoint(i)" color="accent" mat-icon-button aria-label="Delete">
+            <button (click)="deletePoint(i)" aria-label="Delete" color="accent" mat-icon-button>
               <mat-icon>delete</mat-icon>
             </button>
           </mat-card-actions>
