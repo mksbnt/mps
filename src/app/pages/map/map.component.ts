@@ -59,7 +59,7 @@ export class MapComponent implements OnInit {
   }
 
   deletePoint(index: number): void {
-    const points = this.points$.getValue();
+    const points = [...this.points$.value];
     points.splice(index, 1);
 
     for (let i = index; i < points.length; i++) {
