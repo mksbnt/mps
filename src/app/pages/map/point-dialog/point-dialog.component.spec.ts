@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PointDialogComponent } from './point-dialog.component';
-import { IPoint } from '../../../core/models/point.model';
 
 describe('PointDialogComponent', () => {
   let component: PointDialogComponent;
