@@ -2,17 +2,17 @@
   <form [formGroup]="form">
     <mat-form-field appearance="fill">
       <mat-label>Number</mat-label>
-      <input formControlName="number" matInput>
+      <input formControlName="number" matInput  type="number" step="1">
     </mat-form-field>
 
     <mat-form-field appearance="fill">
       <mat-label>LAT</mat-label>
-      <input formControlName="lat" matInput type="number" step="0.000001">
+      <input formControlName="lat" matInput type="number" step="0.0001">
     </mat-form-field>
 
     <mat-form-field appearance="fill">
       <mat-label>LNG</mat-label>
-      <input formControlName="lng" matInput type="number" step="0.000001">
+      <input formControlName="lng" matInput type="number" step="0.0001">
     </mat-form-field>
 
 
