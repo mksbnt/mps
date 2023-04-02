@@ -1,9 +1,8 @@
-<div mat-dialog-content>
+<div mat-dialog-content class="content">
   <form [formGroup]="form">
-    <mat-form-field appearance="fill">
-      <mat-label>Number</mat-label>
-      <input formControlName="number" matInput  type="number" step="1">
-    </mat-form-field>
+    <div class="wrapper__marker">
+      <div class="marker">{{point.number}}</div>
+    </div>
 
     <mat-form-field appearance="fill">
       <mat-label>LAT</mat-label>
@@ -24,6 +23,10 @@
 </div>
 
 <div mat-dialog-actions class="actions">
-  <button mat-button mat-dialog-close cdkFocusInitial>CLOSE</button>
-  <button mat-button [mat-dialog-close]="point">SAVE</button>
+  <button mat-icon-button mat-dialog-close cdkFocusInitial color="accent" aria-label="Close">
+    <mat-icon>close</mat-icon>
+  </button>
+  <button mat-icon-button [mat-dialog-close]="point" color="accent" aria-label="Save">
+    <mat-icon>check</mat-icon>
+  </button>
 </div>

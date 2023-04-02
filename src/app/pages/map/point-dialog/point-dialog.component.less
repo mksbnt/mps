@@ -1,9 +1,20 @@
-form {
-  display: flex;
-  flex-direction: column;
+.content {
+  padding: 8px 8px 0 8px;
+  .wrapper__marker {
+    padding-bottom: 4px;
+  }
+  form {
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 .actions {
+  position: relative;
+  top: -12px;
   display: flex;
-  justify-content: space-evenly;
+  justify-content: space-around;
+  button {
+    transform: scale(0.8);
+  }
 }

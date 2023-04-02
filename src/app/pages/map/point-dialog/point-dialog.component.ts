@@ -9,7 +9,7 @@ import {NonNullableFormBuilder} from "@angular/forms";
   templateUrl: './point-dialog.component.html',
   styleUrls: ['./point-dialog.component.less']
 })
-export class PointDialogComponent implements OnInit {
+export class PointDialogComponent {
   formBuilder = inject(NonNullableFormBuilder);
   form = this.formBuilder.group<IPoint>({
     number: this.data.number,
@@ -28,9 +28,5 @@ export class PointDialogComponent implements OnInit {
       lng: this.form.controls.lng.value,
       height: this.form.controls.height.value
     }
-  }
-
-  ngOnInit(): void {
-    this.form.controls.number.disable();
   }
 }
